@@ -8,6 +8,5 @@ Status: `IDEA` · `CONSIDERING` · `PLANNED` · `DONE` · `REJECTED`
 
 | # | Suggestion | Category | Effort | Status |
 |---|---|---|---|---|
-
-No open suggestions yet — see sentinel_fork's own SUGGESTIONS.md for ideas that
-are still shared across agents rather than specific to Trace.
+| 1 | Cite every claim back to the source that produced it | design | M | IDEA |
+| 2 | A per-target audit trail, so a research session can be reconstructed later | security | M | CONSIDERING |

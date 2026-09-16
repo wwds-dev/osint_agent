@@ -9,8 +9,5 @@
 
 ## v1 — current
 
-No items yet. Trace's own backlog was split out of sentinel_fork's shared
-TODO.md on 2026-09-14 (see that project's TODO.md/SUGGESTIONS.md for the still
-mostly-shared cross-cutting work — request-guard, main.py refactor, GUI system
-— that touches every agent, Trace included, rather than one specifically).
-Add items here going forward as Trace-specific work comes up.
+- [ ] `P2` `docs` `@ai` State the public-source boundary in the panel, not only in the README. Trace is the agent most likely to be pointed at a real person, and the limit it observes should be visible where the query is typed.
+- [ ] `P2` `feature` `security` `@ai` Public-source adapters, staged. Split out of the parent list's four-agent "staged specialist integrations" item. Public sources only; excludes denial of service, credential theft, stealth/persistence and uncontrolled exploitation. *(split out of sentinel_fork/TODO.md)*
