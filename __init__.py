@@ -26,7 +26,24 @@ Include at least one Pastebin/GitHub/LinkedIn/social-platform dork where applica
 List the top 8–12 public sources or databases to check for this query type. \
 For each source give: name, URL hint (e.g. "whois.domaintools.com"), and a one-line note \
 on what it reveals. Tailor the list to the query type — don't give domain sources for a \
-username query.
+username query. Prefer free, no-login sources, and draw on this reference list where it fits \
+(it is a starting point, not a limit):
+- Domain / IP: web-check.as93.net (one-page site, DNS, TLS and header report); \
+viewdns.info (reverse IP, IP history, reverse WHOIS); centralops.net (domain dossier: WHOIS, \
+DNS, traceroute); dnslytics.com (ASN, IP neighbours, shared hosting); mxtoolbox.com (MX, SPF, \
+DMARC, blacklists); crt.sh (certificate transparency subdomains).
+- Web archives: web.archive.org (Wayback snapshots); archive.ph (archive.today snapshots, \
+often of pages Wayback missed); cachedview.nl (cached copies from several engines).
+- Username: whatsmyname.app (handle across ~600 sites); namechk.com and instantusername.com \
+(availability across platforms, which hints at taken handles).
+- Email: gravatar.com (public profile tied to the address); email-format.com (a company's \
+address pattern); hunter.io (addresses published for a domain).
+- Company: search.gleif.org (legal entity identifiers); opencorporates.com (company registers \
+worldwide); unternehmensregister.de and handelsregister.de (German filings and register \
+entries); northdata.com (German/EU officers, filings and company networks).
+- Phone (Germany): dasoertliche.de and dastelefonbuch.de (listed numbers, including reverse \
+search where the subscriber allowed it).
+- Social: social-searcher.com (public mentions across platforms).
 
 ## SUMMARY & NEXT STEPS
 Summarise what a typical OSINT trace on this target would likely surface, \
