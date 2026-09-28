@@ -5,6 +5,8 @@ import ipaddress
 import re
 from urllib.parse import urlsplit
 
+from services import osint_catalog
+
 
 SYSTEM_PROMPT = """You are a light OSINT analysis assistant. Your role is to help structure queries, \
 suggest search strategies, and summarise what public sources are likely to reveal — without \
@@ -53,6 +55,38 @@ Keep this section concise and actionable.
 
 Do not fabricate results, real data, or live lookups. Stay within legal, \
 public-source intelligence only."""
+
+
+#: Trace query type → OSINT Framework catalogue target kind.
+CATALOG_KINDS = {
+    "Domain": "domain", "IP Address": "ip", "Email": "email",
+    "Username": "username", "Company": "company", "Phone": "phone",
+    "Person": "person",
+}
+CATALOG_LIMIT = 15
+
+
+def catalog_block(query_type: str) -> str:
+    """Extra public-source suggestions from the cached OSINT Framework catalogue.
+
+    Reads the local cache only (never the network) and returns "" when there
+    is no cache or no fitting tool, so Structure Query stays offline.
+    """
+    kind = CATALOG_KINDS.get(query_type)
+    if kind is None:
+        return ""
+    picks = osint_catalog.select(
+        osint_catalog.cached_tools(), kind, audience="trace",
+        limit=CATALOG_LIMIT, exclude_hosts=osint_catalog.hosts_in(SYSTEM_PROMPT),
+    )
+    if not picks:
+        return ""
+    return (
+        f"\n\nMORE {query_type.upper()} SOURCES — from the {osint_catalog.ATTRIBUTION} "
+        "catalogue; each is live, free, needs no account, and is passive (the target "
+        "is not contacted). Choose from these and the reference list above; never "
+        "invent a URL:\n" + osint_catalog.format_block(picks)
+    )
 
 
 @dataclass(frozen=True)
@@ -190,6 +224,6 @@ class OSINTAgent:
             "Produce the four sections as specified."
         )
         return [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT + catalog_block(query_type)},
             {"role": "user", "content": user_content},
         ]
