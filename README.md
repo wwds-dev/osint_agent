@@ -15,6 +15,7 @@ A fast, lightweight open-source-intelligence assistant. Given a target (name, us
 | Model override | Optional provider/model change; the task recommendation is selected by default. |
 | Structure Query | Generate a model-based investigation plan without contacting research sources. |
 | Live Research | After explicit confirmation, query WHOIS, DNS, crt.sh and the Wayback Machine for domains (WHOIS and DNS for IPs), URLScan for usernames, individually selected email services, or GLEIF for company legal-entity records. Person and phone targets remain local-only. |
+| Exposure Check | After explicit confirmation, answer "is this domain, company or email in a leak or on a ransomware leak site?" using clearnet services — ransomware.live, Ahmia and Intelligence X. Domain, Company and Email targets only. Text metadata only; no onion site is contacted and nothing is downloaded. |
 | Stop | Request cancellation; completed source results remain visible as a partial result. |
 
 ## Outputs
@@ -65,6 +66,30 @@ targets. It does not send those personal identifiers to people-search,
 reverse-phone, or data-broker services. Structure Query remains available for a
 local planning-only workflow.
 
+**Exposure Check** answers the question most users actually care about — "is my
+company, domain or email in a leak or on a ransomware leak site?" — from clearnet
+services that do their own crawling under their own legal setup, so Sentinel
+never touches Tor and never downloads leaked material. A separate confirmation
+dialog lists the destinations and lets the user deselect any of them:
+- **ransomware.live** (free, no key) — victims posted on ransomware groups' leak
+  sites, searched by domain/company. Each hit is tagged by *where* it matched: a
+  victim-name or domain match is the target itself being extorted (a probable
+  breach); a description-only match is a mention in someone else's post. The free
+  API is rate-limited to about one request per minute.
+- **Ahmia** (free, no key) — a clearnet search of indexed `.onion` sites with
+  abuse content filtered out by Ahmia. Returns onion addresses, titles and
+  snippets as text; the onion sites themselves are never contacted.
+- **Intelligence X** (`INTELX_API_KEY`, paid) — leaks, pastes and archived
+  dark-web material matching a strong selector. Only the search index is read;
+  the file/download endpoints are never called. Intelligence X discontinued its
+  free public API keys, so this source stays skipped until a licensed key is set.
+
+The verdict card leads with the strongest honest claim: a direct ransomware
+victim match is flagged as a probable breach to verify; an index-only hit is
+presented as a lead to review; no hits is reported as "not found in the sources
+queried", never as a guarantee of safety. Bloodhound runs the same free sources
+automatically as part of Deep-Dive live collection (Intelligence X when keyed).
+
 ## How it works
 `OSINTAgent.validate_target()` validates and classifies the target entirely
 offline. `build_messages()` then wraps the accepted target in a system prompt
@@ -81,6 +106,7 @@ request guard, cost tracking, history, and run logger.
 | `providers/username_lookup.py` | Consented URLScan search for public pages containing a username. |
 | `providers/email_lookup.py` | Per-source EmailRep, Gravatar (hash only), HIBP, and BreachDirectory collection with breach services opt-in. |
 | `providers/company_lookup.py` | Consented company-name search against GLEIF's public legal-entity records. |
+| `providers/exposure_lookup.py` | Consented dark-web exposure check for a domain/company/email across ransomware.live, Ahmia, and Intelligence X (`ExposureLookupWorker` in `ui/workers.py`). Text-only; no onion contact, no downloads. |
 
 ## Extend it
 - **Person/phone enrichment**: intentionally local-only. Do not add people-search, reverse-phone, or data-broker collectors without a new privacy review and explicit source-specific consent design.
@@ -91,5 +117,8 @@ request guard, cost tracking, history, and run logger.
 Any model provider (API key and consent for cloud; Ollama is local and free).
 HIBP requires `HIBP_API_KEY`; its checkbox is unavailable without one. EmailRep,
 Gravatar, BreachDirectory, URLScan, GLEIF, WHOIS, the configured DNS resolver,
-crt.sh, and the Wayback Machine can be used without a configured application key, subject to their own limits
-and availability. Structure Query never contacts these services.
+crt.sh, the Wayback Machine, ransomware.live and Ahmia can be used without a
+configured application key, subject to their own limits and availability.
+Intelligence X requires `INTELX_API_KEY` (paid; its free public keys were
+discontinued) and stays skipped without one. Structure Query never contacts
+these services.
