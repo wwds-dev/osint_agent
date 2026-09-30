@@ -176,7 +176,13 @@ class OSINTAgent:
     @staticmethod
     def _domain_host(value: str) -> str:
         candidate = value.strip().lower()
-        parsed = urlsplit(candidate if "://" in candidate else f"//{candidate}")
+        try:
+            parsed = urlsplit(candidate if "://" in candidate else f"//{candidate}")
+        except ValueError:
+            # urlsplit raises ValueError ("Invalid IPv6 URL") on an unbalanced
+            # '[' or ']'. validate_target must return a result, never raise, so
+            # treat an unparseable target as having no host.
+            return ""
         return (parsed.hostname or "").rstrip(".")
 
     @classmethod
